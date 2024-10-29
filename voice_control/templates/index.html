@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robot Arm Controller</title>
+</head>
+<body>
+    <h1>Robot Arm Controller</h1>
+    <button onclick="sendCommand('sit')">Sit</button>
+    <button onclick="sendCommand('stand')">Stand</button>
+    <button onclick="sendCommand('animation')">Start Animation</button>
+    <button onclick="sendCommand('servo 0 90')">Move Servo 0 to 90</button>
+    <!-- Add more buttons as needed -->
+
+    <script>
+        function sendCommand(command) {
+            fetch('/control', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({command: command})
+            }).then(response => response.json())
+              .then(data => console.log(data));
+        }
+    </script>
+</body>
+</html>

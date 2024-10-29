@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robotic Arm Controller</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #2c2c2c;
+            color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            padding: 20px;
+        }
+        .video-container {
+            margin-bottom: 20px;
+        }
+        .slider {
+            margin: 10px 0;
+            width: 100%;
+        }
+        .control-panel button {
+            margin: 5px;
+        }
+        .slider-container {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Robotic Arm Controller</h1>
+        
+        <!-- IP Camera Stream -->
+        <div class="video-container">
+            <h2>IP Camera Stream</h2>
+            <img src="http://192.168.29.234:81/stream" alt="IP Camera Stream" style="width: 100%; max-height: 500px;">
+        </div>
+        
+        <!-- Control Buttons -->
+        <div class="control-panel">
+            <button onclick="sendCommand('/sit')">Sit</button>
+            <button onclick="sendCommand('/stand')">Stand</button>
+            <button onclick="sendGripperCommand('open')">Open Gripper</button>
+            <button onclick="sendGripperCommand('close')">Close Gripper</button>
+            <button onclick="startAnimation()">Start Animation</button>
+        </div>
+        
+        <!-- Servo Controls -->
+        <h2>Move Servo</h2>
+        <div class="slider-container">
+            <h3>Shoulder</h3>
+            <input type="range" id="servo0" min="0" max="180" value="{{ angles[0] }}" class="slider" oninput="updateAngle(0)">
+            <span id="servo0Value">{{ angles[0] }}</span>
+        </div>
+        <div class="slider-container">
+            <h3>Base</h3>
+            <input type="range" id="servo1" min="0" max="180" value="{{ angles[1] }}" class="slider" oninput="updateAngle(1)">
+            <span id="servo1Value">{{ angles[1] }}</span>
+        </div>
+        <div class="slider-container">
+            <h3>Elbow</h3>
+            <input type="range" id="servo2" min="0" max="180" value="{{ angles[2] }}" class="slider" oninput="updateAngle(2)">
+            <span id="servo2Value">{{ angles[2] }}</span>
+        </div>
+        <div class="slider-container">
+            <h3>Wrist Y</h3>
+            <input type="range" id="servo3" min="0" max="180" value="{{ angles[3] }}" class="slider" oninput="updateAngle(3)">
+            <span id="servo3Value">{{ angles[3] }}</span>
+        </div>
+        <div class="slider-container">
+            <h3>Wrist Rot</h3>
+            <input type="range" id="servo4" min="0" max="180" value="{{ angles[4] }}" class="slider" oninput="updateAngle(4)">
+            <span id="servo4Value">{{ angles[4] }}</span>
+        </div>
+        <div class="slider-container">
+            <h3>Gripper</h3>
+            <input type="range" id="servo5" min="0" max="180" value="{{ angles[5] }}" class="slider" oninput="updateAngle(5)">
+            <span id="servo5Value">{{ angles[5] }}</span>
+        </div>
+        
+        <!-- Flashlight Intensity Slider -->
+        <h2>Adjust Flashlight Intensity</h2>
+        <div class="slider-container">
+            <input type="range" id="flashlightIntensity" min="0" max="255" value="0" class="slider" oninput="updateFlashlightIntensity()">
+            <span id="flashlightIntensityValue">0</span>
+        </div>
+    </div>
+    
+    <!-- Include Socket.IO -->
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script>
+        var socket = io();
+
+        function updateAngle(servoNum) {
+            const angle = document.getElementById(`servo${servoNum}`).value;
+            document.getElementById(`servo${servoNum}Value`).textContent = angle;
+            fetch('/move', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ servo_num: servoNum, angle: parseInt(angle) })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    console.log('Angle updated successfully');
+                } else {
+                    console.log('Error updating angle');
+                }
+            });
+        }
+
+        function sendCommand(endpoint) {
+            fetch(endpoint, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        updateSliders(data.angles);
+                    } else {
+                        console.log('Error performing action');
+                    }
+                });
+        }
+
+        function sendGripperCommand(action) {
+            fetch('/gripper', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: action })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    updateSliders(data.angles);
+                } else {
+                    console.log('Error performing gripper action');
+                }
+            });
+        }
+
+        function startAnimation() {
+            socket.emit('start_animation');
+        }
+
+        socket.on('update_angles', function(data) {
+            updateSliders(data.angles);
+        });
+
+        function updateSliders(angles) {
+            for (let i = 0; i < angles.length; i++) {
+                document.getElementById(`servo${i}`).value = angles[i];
+                document.getElementById(`servo${i}Value`).textContent = angles[i];
+            }
+        }
+
+        function updateFlashlightIntensity() {
+            const intensity = document.getElementById('flashlightIntensity').value;
+            document.getElementById('flashlightIntensityValue').textContent = intensity;
+            fetch(`http://192.168.29.234/control?var=led_intensity&val=${intensity}`)
+                .then(response => response.text())
+                .then(data => {
+                    console.log('Flashlight intensity updated');
+                })
+                .catch(error => {
+                    console.error('Error updating flashlight intensity:', error);
+                });
+        }
+    </script>
+</body>
+</html>
