@@ -1,6 +1,6 @@
-# 6DOF Robotic Arm Control
+# 6DOF Robotic Arm Control Inverse Kinematics Test
 
-This project allows you to control a 6DOF robotic arm using an Arduino that receives commands from an ESP8266 microcontroller. The ESP8266 hosts a web interface for sending commands to the Arduino, making it easy to control the servos remotely.
+This project allows you to control a 6DOF robotic arm using an Arduino that receives commands from an ESP8266 microcontroller. The ESP8266 hosts a web interface for sending commands to the Arduino, making it easy to control the servos remotely. This setup is primarily for testing purposes related to inverse kinematics.
 
 ## Table of Contents
 
@@ -20,6 +20,7 @@ This project allows you to control a 6DOF robotic arm using an Arduino that rece
 - Web-based interface hosted on the ESP8266 for sending commands to the Arduino.
 - LED indication for command activity.
 - Real-time feedback in the web interface.
+- Designed for testing inverse kinematics algorithms.
 
 ## Hardware Requirements
 
