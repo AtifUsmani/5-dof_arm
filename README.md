@@ -38,7 +38,7 @@ This project demonstrates how to control a 6 DOF robotic arm using the Adafruit 
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/yourusername/6dof-robotic-arm.git
+   git clone https://github.com/AtifUsmani/6dof-robotic-arm.git
    cd 6dof-robotic-arm
    ```
 
