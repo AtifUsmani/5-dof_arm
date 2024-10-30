@@ -8,6 +8,8 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
 // Array to hold current pulse widths for each servo
 int currentPulses[6] = {0, 0, 0, 0, 0, 0}; // Assuming 6 servos
+int targetPulses[6] = {0, 0, 0, 0, 0, 0}; // Target pulses for each servo
+bool moving[6] = {false, false, false, false, false, false}; // Moving state for each servo
 
 void setup() {
   Serial.begin(9600);
@@ -27,17 +29,30 @@ void loop() {
       int servoNum = command.substring(0, separatorIndex).toInt();
       int angle = command.substring(separatorIndex + 1).toInt();
 
-      if (servoNum >= 0 && servoNum <= 5) {
-        if (angle >= 0 && angle <= 180) {
-          smoothMove(servoNum, angle);
-        } else {
-          Serial.println("Error: Angle must be between 0 and 180.");
-        }
+      if (servoNum >= 0 && servoNum <= 5 && angle >= 0 && angle <= 180) {
+        targetPulses[servoNum] = angleToPulse(angle, servoNum);
+        moving[servoNum] = true; // Mark this servo as moving
       } else {
-        Serial.println("Error: Invalid servo number.");
+        Serial.println("Error: Invalid command.");
       }
     }
   }
+
+  // Move all servos that are marked as moving
+  for (int i = 0; i < 6; i++) {
+    if (moving[i]) {
+      if (currentPulses[i] < targetPulses[i]) {
+        currentPulses[i]++;
+      } else if (currentPulses[i] > targetPulses[i]) {
+        currentPulses[i]--;
+      } else {
+        moving[i] = false; // Stop moving if reached target
+      }
+      pwm.setPWM(i, 0, currentPulses[i]); // Update PWM signal
+    }
+  }
+
+  delay(STEP_DELAY); // Add a small delay to control update frequency
 }
 
 int angleToPulse(int angle, int servoNum) {
@@ -54,37 +69,13 @@ int angleToPulse(int angle, int servoNum) {
   return map(angle, 0, 180, minPulse, maxPulse);
 }
 
-void smoothMove(int servoNum, int targetAngle) {
-  // Get the current pulse width for the specified servo
-  int targetPulse = angleToPulse(targetAngle, servoNum);
-  
-  // Gradually move to the target pulse width
-  // Check the current pulse width stored in the array
-  int currentPulse = currentPulses[servoNum];
-
-  // Determine the direction of movement
-  int step = (currentPulse < targetPulse) ? 1 : -1;
-
-  // Gradually move to the target pulse width
-  for (int pulse = currentPulse; pulse != targetPulse; pulse += step) {
-    pwm.setPWM(servoNum, 0, pulse);
-    delay(STEP_DELAY); // Wait for a short period to smooth the movement
-  }
-  
-  // Ensure the final position is set to the target pulse width
-  pwm.setPWM(servoNum, 0, targetPulse);
-  
-  // Update the current pulse in the array
-  currentPulses[servoNum] = targetPulse;
-}
-
 void initializeServos() {
   setServo(0, 170); // Shoulder
   setServo(1, 90);  // Base
   setServo(2, 180); // Elbow
   setServo(3, 80);  // Wrist Y
   setServo(4, 30);  // Wrist Rot
-  setServo(5, 0); // Gripper
+  setServo(5, 0);   // Gripper
 }
 
 // Helper function to set servo angle and update current pulse
