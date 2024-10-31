@@ -10,6 +10,8 @@ This project allows you to control a 6DOF robotic arm using an Arduino that rece
 - [Setup Instructions](#setup-instructions)
 - [Usage](#usage)
 - [Code Overview](#code-overview)
+- [3D Simulation of the Robotic Arm](#3d-simulation-of-the-robotic-arm)
+- [2D Animation of the Robotic Arm](#2d-animation-of-the-robotic-arm)
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
 - [License](#license)
@@ -103,6 +105,61 @@ This project allows you to control a 6DOF robotic arm using an Arduino that rece
 - **Arduino Code**:
   - `setup()`: Initializes the serial communication and sets up the servos.
   - `loop()`: Listens for incoming commands from the ESP8266 and controls the servos accordingly.
+
+## 3D Simulation of the Robotic Arm
+
+In addition to the physical control of the 6DOF robotic arm, this project includes a 3D simulation for visualizing the arm's movements. The simulation allows you to:
+
+- **Visualize Arm Movements**: See how the robotic arm behaves in real-time as you adjust the servo angles through the web interface.
+- **Interactive Controls**: Adjust the angles of the arm segments using sliders, making it easier to understand the inverse kinematics involved.
+- **Debugging Tool**: Use the simulation to test and debug your inverse kinematics algorithms before applying them to the physical robot.
+
+### Requirements for 3D Simulation
+
+- **Python**: Ensure you have Python installed on your system.
+- **Libraries**: You will need the following libraries:
+  - `numpy`
+  - `matplotlib`
+  
+  Install the necessary libraries using pip:
+  ```bash
+  pip install numpy matplotlib
+  ```
+
+### Running the 3D Simulation
+
+1. **Clone or Download the Simulation Code**: Ensure you have the simulation code in your project directory.
+2. **Run the Simulation**: Execute the simulation script in your Python environment. It will open a window displaying the 3D model of the robotic arm.
+3. **Control the Simulation**: Use the sliders in the simulation to adjust the angles of the arm and visualize the corresponding movements.
+
+## 2D Animation of the Robotic Arm
+
+This project also includes a 2D animation for visualizing the robotic arm's movements. The 2D simulation provides an intuitive way to see how the arm behaves as you adjust the joint angles.
+
+### Key Features of the 2D Animation
+
+- **Interactive Control**: Use sliders to adjust the angles of each joint in real-time.
+- **Visual Representation**: The arm is represented graphically, with different colors for each segment and the end effector.
+- **Collision Detection**: The simulation includes basic collision detection to visualize interactions with the environment.
+
+### Requirements for 2D Animation
+
+- **Python**: Ensure you have Python installed on your system.
+- **Libraries**: You will need the following libraries:
+  - `numpy`
+  - `matplotlib`
+  - `sympy`
+  
+  Install the necessary libraries using pip:
+  ```bash
+  pip install numpy matplotlib sympy
+  ```
+
+### Running the 2D Animation
+
+1. **Clone or Download the Animation Code**: Ensure you have the animation code in your project directory.
+2. **Run the Animation**: Execute the animation script in your Python environment. A window will open displaying the 2D model of the robotic arm.
+3. **Adjust Angles**: Use the sliders to change the angles of the arm and observe the resulting movements in the plot.
 
 ## Troubleshooting
 
