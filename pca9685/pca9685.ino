@@ -3,7 +3,7 @@
 
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
-#define SERVO_FREQ 52 // Analog servos run at ~50 Hz updates
+#define SERVO_FREQ 62 // Analog servos run at ~50 Hz updates
 #define STEP_DELAY 20 // Delay between steps in milliseconds
 
 // Array to hold current pulse widths for each servo
@@ -68,17 +68,25 @@ void moveServoSmooth(int servoNum) {
 
 int angleToPulse(int angle, int servoNum) {
   int minPulse, maxPulse;
+
   switch (servoNum) {
-    case 0: minPulse = 150; maxPulse = 450; break; // Base
+    case 0: 
+      minPulse = 110; 
+      maxPulse = 570;
+      break; 
     case 1: minPulse = 100; maxPulse = 500; break; // Shoulder
-    case 2: minPulse = 100; maxPulse = 480; break; // Elbow
+    case 2: minPulse = 150; maxPulse = 500; break; // Elbow
     case 3: minPulse = 100; maxPulse = 500; break; // Wrist Y
     case 4: minPulse = 150; maxPulse = 400; break; // Wrist Rot
     case 5: minPulse = 170; maxPulse = 320; break; // Gripper
     default: minPulse = 150; maxPulse = 500; break;
   }
+
+  angle = constrain(angle, 0, 180); // Ensure it's within bounds
+
   return map(angle, 0, 180, minPulse, maxPulse);
 }
+
 
 void initializeServos() {
   setServo(0, 170); // Base
